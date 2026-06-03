@@ -197,13 +197,16 @@ def checkout_success(request):
     if not session_id:
         return redirect("index")
 
-    session = stripe.checkout.Session.retrieve(session_id)
+    session = stripe.checkout.Session.retrieve(
+        session_id,
+        expand=["payment_intent"]
+    )
 
     if session.payment_status != "paid":
         messages.error(request, "決済が完了していません。")
         return redirect("index")
 
-    order_id = session.metadata.get("order_id")
+    order_id = session.metadata["order_id"]
     order = get_object_or_404(Order, pk=order_id, buyer=request.user, status="pending")
     order.stripe_payment_id = session.payment_intent
     order.status = "in_progress"

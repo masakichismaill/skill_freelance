@@ -1,0 +1,16 @@
+{% extends "core/base.html" %}
+
+{% block title %}トップ | スキルフリマ{% endblock %}
+
+{% block content %}
+<div class="px-4 py-5 text-center">
+  <h1 class="display-5 fw-bold">スキルを売買しよう</h1>
+  <p class="lead mb-4 text-muted">あなたのスキルを出品したり、必要なスキルを購入できるマーケットプレイスです。</p>
+  {% if user.is_authenticated %}
+    <a href="{% url 'mypage' %}" class="btn btn-primary btn-lg">マイページへ</a>
+  {% else %}
+    <a href="{% url 'register' %}" class="btn btn-primary btn-lg me-2">無料で始める</a>
+    <a href="{% url 'login' %}" class="btn btn-outline-secondary btn-lg">ログイン</a>
+  {% endif %}
+</div>
+{% endblock %}

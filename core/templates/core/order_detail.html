@@ -1,0 +1,110 @@
+{% extends "core/base.html" %}
+
+{% block title %}取引 #{{ order.pk }} | スキルフリマ{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-lg-8">
+
+    {# ── 取引情報 ── #}
+    <div class="card shadow-sm mb-4">
+      <div class="card-header d-flex justify-content-between align-items-center">
+        <h5 class="mb-0">取引 #{{ order.pk }}</h5>
+        {% if order.status == 'pending' %}
+          <span class="badge bg-secondary">決済待ち</span>
+        {% elif order.status == 'in_progress' %}
+          <span class="badge bg-info text-dark">取引中</span>
+        {% elif order.status == 'completed' %}
+          <span class="badge bg-success">完了</span>
+        {% elif order.status == 'cancelled' %}
+          <span class="badge bg-danger">キャンセル</span>
+        {% endif %}
+      </div>
+      <div class="card-body">
+        <dl class="row mb-0">
+          <dt class="col-sm-4">スキル</dt>
+          <dd class="col-sm-8">
+            <a href="{% url 'skill_detail' order.skill.pk %}">{{ order.skill.title }}</a>
+          </dd>
+          <dt class="col-sm-4">出品者</dt>
+          <dd class="col-sm-8">
+            <a href="{% url 'user_profile' order.skill.user.pk %}">{{ order.skill.user.username }}</a>
+          </dd>
+          <dt class="col-sm-4">購入者</dt>
+          <dd class="col-sm-8">{{ order.buyer.username }}</dd>
+          <dt class="col-sm-4">金額</dt>
+          <dd class="col-sm-8">¥{{ order.price|floatformat:0 }}</dd>
+          <dt class="col-sm-4">購入日</dt>
+          <dd class="col-sm-8">{{ order.created_at|date:"Y年n月j日 H:i" }}</dd>
+        </dl>
+      </div>
+      {% if is_seller and order.status == 'in_progress' %}
+        <div class="card-footer bg-white">
+          <form method="post" action="{% url 'order_complete' order.pk %}">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-success btn-sm"
+                    onclick="return confirm('この取引を完了にしますか？')">
+              完了にする
+            </button>
+          </form>
+        </div>
+      {% endif %}
+      {% if is_buyer and order.status == 'completed' %}
+        <div class="card-footer bg-white d-flex align-items-center gap-3">
+          {% if existing_review %}
+            <span class="text-success fw-semibold">✅ レビュー投稿済み</span>
+          {% else %}
+            <a href="{% url 'order_review' order.pk %}" class="btn btn-outline-warning btn-sm">
+              レビューを投稿する
+            </a>
+          {% endif %}
+        </div>
+      {% endif %}
+    </div>
+
+    {# ── メッセージスレッド ── #}
+    <h6 class="fw-semibold mb-3">メッセージ</h6>
+
+    {% if thread %}
+      <div class="d-flex flex-column gap-3 mb-4">
+        {% for msg in thread %}
+          {% if msg.sender == request.user %}
+            <div class="d-flex justify-content-end">
+              <div class="bg-primary text-white rounded-3 px-3 py-2" style="max-width:75%;">
+                <p class="mb-1" style="white-space:pre-wrap;">{{ msg.body }}</p>
+                <small class="opacity-75">{{ msg.sent_at|date:"n/j H:i" }}</small>
+              </div>
+            </div>
+          {% else %}
+            <div class="d-flex justify-content-start">
+              <div class="bg-light border rounded-3 px-3 py-2" style="max-width:75%;">
+                <div class="fw-semibold small mb-1">{{ msg.sender.username }}</div>
+                <p class="mb-1" style="white-space:pre-wrap;">{{ msg.body }}</p>
+                <small class="text-muted">{{ msg.sent_at|date:"n/j H:i" }}</small>
+              </div>
+            </div>
+          {% endif %}
+        {% endfor %}
+      </div>
+    {% else %}
+      <p class="text-muted small mb-4">まだメッセージはありません。</p>
+    {% endif %}
+
+    {# ── メッセージ送信フォーム ── #}
+    {% if order.status != 'cancelled' %}
+      <div class="card shadow-sm">
+        <div class="card-body">
+          <form method="post">
+            {% csrf_token %}
+            {{ form }}
+            <div class="text-end mt-2">
+              <button type="submit" class="btn btn-primary btn-sm">送信</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    {% endif %}
+
+  </div>
+</div>
+{% endblock %}

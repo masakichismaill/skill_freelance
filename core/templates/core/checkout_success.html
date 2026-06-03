@@ -1,0 +1,38 @@
+{% extends "core/base.html" %}
+
+{% block title %}購入完了 | スキルフリマ{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-md-6 text-center py-5">
+    <div class="display-1 mb-3">✅</div>
+    <h2 class="mb-3">取引を開始しました！</h2>
+    <p class="text-muted mb-4">
+      <strong>{{ order.skill.title }}</strong> の購入が完了しました。<br>
+      出品者（{{ order.skill.user.username }}）からの連絡をお待ちください。
+    </p>
+
+    <div class="card text-start shadow-sm mb-4">
+      <div class="card-body">
+        <dl class="row mb-0">
+          <dt class="col-sm-5">注文番号</dt>
+          <dd class="col-sm-7">#{{ order.pk }}</dd>
+          <dt class="col-sm-5">スキル</dt>
+          <dd class="col-sm-7">{{ order.skill.title }}</dd>
+          <dt class="col-sm-5">金額</dt>
+          <dd class="col-sm-7">¥{{ order.price|floatformat:0 }}</dd>
+          <dt class="col-sm-5">ステータス</dt>
+          <dd class="col-sm-7">
+            <span class="badge bg-info text-dark">取引中</span>
+          </dd>
+        </dl>
+      </div>
+    </div>
+
+    <div class="d-flex gap-2 justify-content-center">
+      <a href="{% url 'order_list' %}" class="btn btn-primary">購入履歴を見る</a>
+      <a href="{% url 'skill_list' %}" class="btn btn-outline-secondary">スキル一覧に戻る</a>
+    </div>
+  </div>
+</div>
+{% endblock %}

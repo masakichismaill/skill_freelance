@@ -1,0 +1,87 @@
+{% extends "core/base.html" %}
+
+{% block title %}レビューを投稿 | スキルフリマ{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-md-6">
+
+    <nav aria-label="breadcrumb" class="mb-3">
+      <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="{% url 'order_detail' order.pk %}">取引 #{{ order.pk }}</a></li>
+        <li class="breadcrumb-item active">レビュー</li>
+      </ol>
+    </nav>
+
+    <div class="card shadow-sm">
+      <div class="card-body p-4">
+        <h2 class="card-title mb-1">レビューを投稿</h2>
+        <p class="text-muted small mb-4">{{ order.skill.title }}（出品者：{{ order.skill.user.username }}）</p>
+
+        {% if existing_review %}
+          <div class="alert alert-success">
+            <strong>レビュー投稿済みです。</strong>
+          </div>
+          <dl class="row">
+            <dt class="col-sm-4">評価</dt>
+            <dd class="col-sm-8">
+              {% for i in "12345" %}
+                {% if forloop.counter <= existing_review.rating %}⭐{% else %}☆{% endif %}
+              {% endfor %}
+              （{{ existing_review.rating }}/5）
+            </dd>
+            <dt class="col-sm-4">コメント</dt>
+            <dd class="col-sm-8">
+              {% if existing_review.comment %}{{ existing_review.comment }}{% else %}<span class="text-muted">なし</span>{% endif %}
+            </dd>
+          </dl>
+          <a href="{% url 'order_detail' order.pk %}" class="btn btn-outline-secondary mt-2">取引ページに戻る</a>
+
+        {% else %}
+          <form method="post">
+            {% csrf_token %}
+
+            <div class="mb-4">
+              <label class="form-label fw-semibold">{{ form.rating.label }}</label>
+              <div class="d-flex gap-3 mt-1">
+                {% for value, label in form.rating.field.choices %}
+                  <div class="form-check form-check-inline">
+                    <input
+                      class="form-check-input"
+                      type="radio"
+                      name="rating"
+                      id="rating_{{ value }}"
+                      value="{{ value }}"
+                      {% if form.rating.value == value|stringformat:"s" %}checked{% endif %}
+                    >
+                    <label class="form-check-label fs-5" for="rating_{{ value }}">
+                      {% if value == 1 %}⭐{% elif value == 2 %}⭐⭐{% elif value == 3 %}⭐⭐⭐{% elif value == 4 %}⭐⭐⭐⭐{% else %}⭐⭐⭐⭐⭐{% endif %}
+                      <span class="small text-muted ms-1">{{ value }}</span>
+                    </label>
+                  </div>
+                {% endfor %}
+              </div>
+              {% if form.rating.errors %}
+                <div class="text-danger small mt-1">{{ form.rating.errors.0 }}</div>
+              {% endif %}
+            </div>
+
+            <div class="mb-3">
+              <label for="{{ form.comment.id_for_label }}" class="form-label fw-semibold">
+                {{ form.comment.label }}
+              </label>
+              {{ form.comment }}
+            </div>
+
+            <div class="d-flex gap-2">
+              <button type="submit" class="btn btn-warning fw-bold">投稿する</button>
+              <a href="{% url 'order_detail' order.pk %}" class="btn btn-outline-secondary">キャンセル</a>
+            </div>
+          </form>
+        {% endif %}
+
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

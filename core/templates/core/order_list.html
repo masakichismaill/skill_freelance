@@ -1,0 +1,57 @@
+{% extends "core/base.html" %}
+
+{% block title %}購入履歴 | スキルフリマ{% endblock %}
+
+{% block content %}
+<h2 class="mb-4">購入履歴</h2>
+
+{% if orders %}
+  <div class="table-responsive">
+    <table class="table table-hover align-middle">
+      <thead class="table-light">
+        <tr>
+          <th>注文番号</th>
+          <th>スキル</th>
+          <th>出品者</th>
+          <th>金額</th>
+          <th>ステータス</th>
+          <th>購入日</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for order in orders %}
+          <tr>
+            <td class="text-muted">#{{ order.pk }}</td>
+            <td>
+              <a href="{% url 'skill_detail' order.skill.pk %}">{{ order.skill.title }}</a>
+            </td>
+            <td>{{ order.skill.user.username }}</td>
+            <td>¥{{ order.price|floatformat:0 }}</td>
+            <td>
+              {% if order.status == 'pending' %}
+                <span class="badge bg-secondary">決済待ち</span>
+              {% elif order.status == 'in_progress' %}
+                <span class="badge bg-info text-dark">取引中</span>
+              {% elif order.status == 'completed' %}
+                <span class="badge bg-success">完了</span>
+              {% elif order.status == 'cancelled' %}
+                <span class="badge bg-danger">キャンセル</span>
+              {% endif %}
+            </td>
+            <td>{{ order.created_at|date:"Y/n/j H:i" }}</td>
+            <td>
+              <a href="{% url 'order_detail' order.pk %}" class="btn btn-outline-secondary btn-sm">詳細</a>
+            </td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+{% else %}
+  <div class="text-center py-5 text-muted">
+    <p class="fs-5">購入履歴がありません。</p>
+    <a href="{% url 'skill_list' %}" class="btn btn-primary mt-2">スキルを探す</a>
+  </div>
+{% endif %}
+{% endblock %}

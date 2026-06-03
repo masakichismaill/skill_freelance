@@ -1,0 +1,70 @@
+{% extends "core/base.html" %}
+
+{% block title %}{{ skill.title }} | スキルフリマ{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-lg-8">
+
+    {# パンくず #}
+    <nav aria-label="breadcrumb" class="mb-3">
+      <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="{% url 'skill_list' %}">スキル一覧</a></li>
+        <li class="breadcrumb-item active">{{ skill.title }}</li>
+      </ol>
+    </nav>
+
+    <div class="card shadow-sm">
+      {# スキル画像 #}
+      {% if skill.image %}
+        <img src="{{ skill.image.url }}" class="card-img-top object-fit-cover" style="max-height:320px;" alt="{{ skill.title }}">
+      {% else %}
+        <div class="d-flex align-items-center justify-content-center bg-light text-muted" style="height:200px;font-size:4rem;">
+          🛠️
+        </div>
+      {% endif %}
+
+      <div class="card-body p-4">
+
+        <span class="badge bg-secondary mb-2">{{ skill.category }}</span>
+        <h2 class="card-title mb-1">{{ skill.title }}</h2>
+        <p class="text-muted small mb-3">
+          出品者：<a href="{% url 'user_profile' skill.user.pk %}" class="text-decoration-none"><strong>{{ skill.user.username }}</strong></a>
+          &nbsp;|&nbsp;
+          {{ skill.created_at|date:"Y年n月j日" }}
+        </p>
+
+        <hr>
+
+        <p class="fs-5 fw-bold text-primary mb-4">¥{{ skill.price|floatformat:0 }}</p>
+
+        <h6 class="fw-semibold">サービス内容</h6>
+        <p class="text-body" style="white-space: pre-wrap;">{{ skill.description }}</p>
+
+        <hr>
+
+        {# アクションボタン #}
+        <div class="d-flex gap-2 flex-wrap">
+          {% if user.is_authenticated %}
+            {% if skill.user == user %}
+              <a href="{% url 'skill_edit' skill.pk %}" class="btn btn-outline-primary">編集</a>
+              <a href="{% url 'skill_delete' skill.pk %}" class="btn btn-outline-danger">削除</a>
+            {% else %}
+              <form method="post" action="{% url 'checkout' skill.pk %}">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-primary btn-lg">
+                  購入する（¥{{ skill.price|floatformat:0 }}）
+                </button>
+              </form>
+            {% endif %}
+          {% else %}
+            <a href="{% url 'login' %}" class="btn btn-primary">ログインして購入する</a>
+          {% endif %}
+        </div>
+
+      </div>
+    </div>
+
+  </div>
+</div>
+{% endblock %}

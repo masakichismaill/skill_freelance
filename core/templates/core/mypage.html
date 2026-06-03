@@ -1,0 +1,43 @@
+{% extends "core/base.html" %}
+
+{% block title %}マイページ | スキルフリマ{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-md-7">
+    <h2 class="mb-4">マイページ</h2>
+    <div class="d-flex gap-2 mb-3">
+      <a href="{% url 'order_list' %}" class="btn btn-outline-primary btn-sm">購入履歴</a>
+      <a href="{% url 'skill_new' %}" class="btn btn-outline-success btn-sm">スキルを出品</a>
+    </div>
+
+    <div class="card shadow-sm">
+      <div class="card-body p-4">
+        <div class="d-flex align-items-center mb-3">
+          <div class="rounded-circle bg-secondary text-white d-flex align-items-center justify-content-center me-3"
+               style="width:56px;height:56px;font-size:1.5rem;">
+            {{ user.username|first|upper }}
+          </div>
+          <div>
+            <h4 class="mb-0">{{ user.username }}</h4>
+            <small class="text-muted">{{ user.email }}</small>
+          </div>
+        </div>
+        <hr>
+        <dl class="row mb-0">
+          <dt class="col-sm-4">自己紹介</dt>
+          <dd class="col-sm-8">
+            {% if user.bio %}
+              {{ user.bio }}
+            {% else %}
+              <span class="text-muted">未設定</span>
+            {% endif %}
+          </dd>
+          <dt class="col-sm-4">登録日</dt>
+          <dd class="col-sm-8">{{ user.date_joined|date:"Y年n月j日" }}</dd>
+        </dl>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
